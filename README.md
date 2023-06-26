@@ -5,6 +5,11 @@
 
 # Wendy
 
+### Attention:
+
+This is a fork of the original code by levibostian. Checkout the [original Repo](https://github.com/levibostian/Wendy-iOS/).
+This fork uses the new Swift Package Manager and not Pod. 
+
 Remove the difficulty in making offline-first iOS apps. Sync your offline device storage with remote cloud storage easily. When building offline-first mobile apps, there are *lots* of use cases to think about. Wendy takes care of handling them all for you!
 
 ![project logo. A picture of a person with long red hair.](misc/wendy_logo.jpg)
