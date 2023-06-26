@@ -4,6 +4,7 @@ reports/
 .DS_Store
 
 # Xcode
+.swiftpm/
 build/
 *.pbxuser
 !default.pbxuser
