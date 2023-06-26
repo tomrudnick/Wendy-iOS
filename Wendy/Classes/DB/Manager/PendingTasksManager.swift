@@ -8,7 +8,7 @@ internal class PendingTasksManager {
     private init() {}
 
     internal func insertPendingTask(_ task: PendingTask) -> PendingTask {
-        if task.tag.isEmpty { Fatal.preconditionFailure("You need to set a unique tag for \(String(describing: PendingTask.self)) instances.") }
+        if task.tag.isEmpty { Fatal.customPreconditionFailure("You need to set a unique tag for \(String(describing: PendingTask.self)) instances.") }
 
         let persistedPendingTask: PersistedPendingTask = PersistedPendingTask(pendingTask: task)
         CoreDataManager.shared.saveContext()
@@ -29,7 +29,7 @@ internal class PendingTasksManager {
         }
         
         if persistedPendingTask.groupId == nil {
-            Fatal.preconditionFailure("Task: \(persistedPendingTask.pendingTask.describe()) does not belong to a group.")
+            Fatal.customPreconditionFailure("Task: \(persistedPendingTask.pendingTask.describe()) does not belong to a group.")
         }
 
         let context = CoreDataManager.shared.viewContext
@@ -64,7 +64,7 @@ internal class PendingTasksManager {
 
     internal func getAllTasks() -> [PendingTask] {
         let viewContext = CoreDataManager.shared.viewContext
-        let pendingTaskFactory = Wendy.shared.pendingTasksFactory
+        let _ = Wendy.shared.pendingTasksFactory
 
         do {
             let persistedPendingTasks: [PersistedPendingTask] = try viewContext.fetch(PersistedPendingTask.fetchRequest()) as [PersistedPendingTask]
@@ -107,6 +107,7 @@ internal class PendingTasksManager {
         }
     }
 
+    @discardableResult
     internal func insertPendingTaskError(taskId: Double, humanReadableErrorMessage: String?, errorId: String?) -> PendingTaskError? {
         guard let persistedPendingTask: PersistedPendingTask = self.getTaskByTaskId(taskId) else {
             return nil
@@ -201,7 +202,7 @@ internal class PendingTasksManager {
             return
         }
 
-        let context = CoreDataManager.shared.viewContext
+        let _ = CoreDataManager.shared.viewContext
         persistedPendingTask.setValue(createdAt, forKey: "createdAt")
         CoreDataManager.shared.saveContext()
     }

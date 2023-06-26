@@ -101,7 +101,7 @@ internal class PendingTasksRunner {
                 if Wendy.shared.doesErrorExist(taskId: taskToRun.taskId!) {
                     let errorMessage = "Task: \(taskToRun.describe()) successfully ran, but you have unresolved errors. You should resolve the previously recorded error to Wendy, or return false for running your task."
                     if WendyConfig.strict {
-                        Fatal.preconditionFailure(errorMessage)
+                        Fatal.customPreconditionFailure(errorMessage)
                     } else {
                         LogUtil.w(errorMessage)
                     }

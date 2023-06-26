@@ -43,10 +43,10 @@ public class Wendy {
         // We enforce a best practice here.
         if let similarTask = PendingTasksManager.shared.getRandomTaskForTag(pendingTaskToAdd.tag) {
             if similarTask.groupId == nil && pendingTaskToAdd.groupId != nil {
-                Fatal.preconditionFailure("Cannot add task: \(pendingTaskToAdd.describe()). All subclasses of a PendingTask must either **all** have a groupId or **none** of them have a groupId. Other \(pendingTaskToAdd.tag)'s you have previously added does not have a groupId. The task you are trying to add does have a groupId.")
+                Fatal.customPreconditionFailure("Cannot add task: \(pendingTaskToAdd.describe()). All subclasses of a PendingTask must either **all** have a groupId or **none** of them have a groupId. Other \(pendingTaskToAdd.tag)'s you have previously added does not have a groupId. The task you are trying to add does have a groupId.")
             }
             if similarTask.groupId != nil && pendingTaskToAdd.groupId == nil {
-                Fatal.preconditionFailure("Cannot add task: \(pendingTaskToAdd.describe()). All subclasses of a PendingTask must either **all** have a groupId or **none** of them have a groupId. Other \(pendingTaskToAdd.tag)'s you have previously added does have a groupId. The task you are trying to add does not have a groupId.")
+                Fatal.customPreconditionFailure("Cannot add task: \(pendingTaskToAdd.describe()). All subclasses of a PendingTask must either **all** have a groupId or **none** of them have a groupId. Other \(pendingTaskToAdd.tag)'s you have previously added does have a groupId. The task you are trying to add does not have a groupId.")
             }
         }
 
@@ -59,7 +59,7 @@ public class Wendy {
             }
             if doesErrorExist(taskId: sampleExistingPendingTask.id), resolveErrorIfTaskExists {
                 for pendingTask in existingPendingTasks {
-                    try resolveError(taskId: pendingTask.id)
+                    resolveError(taskId: pendingTask.id)
                 }
                 return sampleExistingPendingTask.id
             }
@@ -77,7 +77,7 @@ public class Wendy {
 
         WendyConfig.logNewTaskAdded(pendingTaskToAdd)
 
-        try runTaskAutomaticallyIfAbleTo(addedPendingTask)
+        runTaskAutomaticallyIfAbleTo(addedPendingTask)
 
         return addedPendingTask.taskId!
     }
@@ -91,6 +91,7 @@ public class Wendy {
 
      Those make this function unique compared to `runTask()` because that function ignores WendyConfig.automaticallyRunTasks *and* if the task.manuallyRun property is set or not.
      */
+    @discardableResult
     internal func runTaskAutomaticallyIfAbleTo(_ task: PendingTask) -> Bool {
         if !WendyConfig.automaticallyRunTasks {
             LogUtil.d("Wendy configured to not automatically run tasks. Skipping execution of newly added task: \(task.describe())")
@@ -100,7 +101,7 @@ public class Wendy {
             LogUtil.d("Task is set to manually run. Skipping execution of newly added task: \(task.describe())")
             return false
         }
-        if try !isTaskAbleToManuallyRun(task.taskId!) {
+        if !isTaskAbleToManuallyRun(task.taskId!) {
             LogUtil.d("Task is not able to manually run. Skipping execution of newly added task: \(task.describe())")
             return false
         }
@@ -118,7 +119,7 @@ public class Wendy {
         }
 
         if !isTaskAbleToManuallyRun(taskId) {
-            Fatal.preconditionFailure("Task is not able to manually run. Task: \(pendingTask.describe())")
+            Fatal.customPreconditionFailure("Task is not able to manually run. Task: \(pendingTask.describe())")
         }
 
         PendingTasksRunner.Scheduler.shared.scheduleRunPendingTask(taskId) { result in
@@ -196,6 +197,7 @@ public class Wendy {
         return getLatestError(taskId: taskId) != nil
     }
 
+    @discardableResult
     public final func resolveError(taskId: Double) -> Bool {
         guard let pendingTask: PendingTask = PendingTasksManager.shared.getPendingTaskTaskById(taskId) else {
             return false
@@ -205,14 +207,14 @@ public class Wendy {
             for existingTask in existingPendingTasks {
                 let existingTaskPendingTask = existingTask.pendingTask
 
-                if try PendingTasksManager.shared.deletePendingTaskError(existingTask.id) {
+                if PendingTasksManager.shared.deletePendingTaskError(existingTask.id) {
                     WendyConfig.logErrorResolved(existingTaskPendingTask)
                     LogUtil.d("Task: \(existingTaskPendingTask.describe()) successfully resolved previously recorded error.")
 
                     if let pendingTaskGroupId = existingTaskPendingTask.groupId {
                         runTasks(filter: RunAllTasksFilter.group(id: pendingTaskGroupId), onComplete: nil)
                     } else {
-                        try runTaskAutomaticallyIfAbleTo(existingTaskPendingTask)
+                        runTaskAutomaticallyIfAbleTo(existingTaskPendingTask)
                     }
 
                     return true

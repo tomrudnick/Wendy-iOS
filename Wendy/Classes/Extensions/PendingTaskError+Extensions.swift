@@ -9,6 +9,6 @@ public extension PendingTaskError {
     }
 
     func resolveError() throws {
-        try Wendy.shared.resolveError(taskId: pendingTask.taskId!)
+        Wendy.shared.resolveError(taskId: pendingTask.taskId!)
     }
 }

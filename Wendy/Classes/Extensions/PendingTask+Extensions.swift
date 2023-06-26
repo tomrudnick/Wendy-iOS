@@ -25,7 +25,7 @@ public extension PendingTask {
 
     func resolveError() {
         let taskId = assertHasBeenAddedToWendy()
-        try Wendy.shared.resolveError(taskId: taskId)
+        Wendy.shared.resolveError(taskId: taskId)
     }
 
     func getLatestError() -> PendingTaskError? {
@@ -49,7 +49,7 @@ public extension PendingTask {
 
     internal func assertHasBeenAddedToWendy() -> Double {
         if !hasBeenAddedToWendy() {
-            Fatal.preconditionFailure("Cannot record error for your task because it has not been added to Wendy (aka: the task id has not been set yet)")
+            Fatal.customPreconditionFailure("Cannot record error for your task because it has not been added to Wendy (aka: the task id has not been set yet)")
         }
 
         return taskId!

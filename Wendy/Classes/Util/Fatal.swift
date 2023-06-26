@@ -2,7 +2,7 @@ import Foundation
 
 internal class Fatal {
     // https://twitter.com/johnsundell/status/850432972478189569
-    internal class func preconditionFailure(_ message: String) {
+    internal class func customPreconditionFailure(_ message: String) {
         NSException(name: .invalidArgumentException, reason: message, userInfo: nil).raise()
         preconditionFailure(message)
     }
