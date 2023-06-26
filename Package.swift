@@ -21,6 +21,7 @@ let package = Package(
         .target(
             name: "Wendy",
             dependencies: [],
+            path: "Wendy",
             resources: [.copy("Assets/Wendy.xcdatamodeld")]),
     ]
 )
